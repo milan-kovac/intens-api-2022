@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: praksa2022-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: praksa2022
+  template:
+    metadata:
+      labels:
+        app: praksa2022
+    spec:
+      containers:
+        - name: praksa2022-image
+          image: milankovac99/praksa2022-image:latest
+          ports:
+            - containerPort: 8088
+          env:
+            - name: PORT
+              value: "8088"
