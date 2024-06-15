@@ -18,6 +18,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+     - name: Set KUBECONFIG
+        run: export KUBECONFIG=/home/.kube/kubeconfig
+
+        
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
@@ -39,35 +43,8 @@ jobs:
           docker build -t $DOCKER_IMAGE .
           docker push $DOCKER_IMAGE
 
-      - name: Set up kubectl
-        uses: azure/setup-kubectl@v1
-        with:
-          version: 'latest'
-          
-  
-      - name: Start Docker container locally
-        run: |
-           docker run -d -e PORT=8088 -p 8088:8088 milankovac99/praksa2022-image:latest
-
-      - name: Check Kubernetes cluster info
-        run: |
-         kubectl cluster-info
-         kubectl get nodes
-         kubectl get pods --all-namespaces
-
-      - name: Download and install Minikube
-        run: |
-         curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
-         sudo install minikube /usr/local/bin/
-
-      - name: Start Minikube
-        run: minikube start --driver=docker --wait=false
-        
-      - name: Set KUBECONFIG
-        run: echo "$(minikube -p minikube kubeconfig)" > $HOME/.kube/config
-
       - name: Update Deployment image
-        run: kubectl set image deployment/praksa2022-deployment praksa2022-image=milankovac99/praksa2022-image:latest
+        run: kubectl set image deployment/praksa2022-deployment praksa2022-image=$DOCKER_IMAGE
 
       - name: Check rollout status
         run: kubectl rollout status deployment/praksa2022-deployment
