@@ -1,0 +1,40 @@
+name: Java Maven Build & Deploy
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml
+
+      - name: Build Docker image
+        run: |
+          docker build -t milankovac99/praksa2022-image:latest .
+          docker push milankovac99/praksa2022-image:latest
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Update Kubernetes deployment
+        run: |
+          kubectl set image deployment/praksa2022-deployment praksa2022-container=milankovac99/praksa2022-image:latest
+          kubectl rollout status deployment/praksa2022-deployment
