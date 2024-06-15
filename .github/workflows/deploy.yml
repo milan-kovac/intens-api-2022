@@ -10,7 +10,9 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      PORT: 8080
+      PORT: 8088
+      DOCKER_IMAGE: milankovac99/praksa2022-image:latest
+      KUBECONFIG: ${{ secrets.KUBE_CONFIG }}
 
     steps:
       - name: Checkout code
@@ -26,19 +28,24 @@ jobs:
       - name: Build with Maven
         run: mvn -B package --file pom.xml
 
+      - name: Build Docker image
+        run: |
+          docker build -t $DOCKER_IMAGE .
+          docker push $DOCKER_IMAGE
+
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build Docker image
-        run: docker build -t milankovac99/praksa2022-image:latest .
-
-      - name: Push Docker image
-        run: docker push milankovac99/praksa2022-image:latest
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v1
+        with:
+          version: 'latest'
 
       - name: Update Kubernetes deployment
         run: |
-          kubectl set image deployment/praksa2022-deployment praksa2022-container=milankovac99/praksa2022-image:latest
+          echo "$KUBECONFIG" | base64 -d > $HOME/.kube/config
+          kubectl set image deployment/praksa2022-deployment praksa2022-image=$DOCKER_IMAGE
           kubectl rollout status deployment/praksa2022-deployment
