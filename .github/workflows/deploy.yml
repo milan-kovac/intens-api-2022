@@ -43,6 +43,9 @@ jobs:
         uses: azure/setup-kubectl@v1
         with:
           version: 'latest'
+          
+      - name: Get service info
+        run: kubectl get service praksa2022-service
 
       - name: Apply Kubernetes deployment
         run: |
