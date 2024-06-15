@@ -46,6 +46,6 @@ jobs:
 
       - name: Apply Kubernetes deployment
         run: |
-          kubectl apply -f deployment.yaml
-          kubectl set image deployment/praksa2022-deployment praksa2022-image=$DOCKER_IMAGE
+          kubectl apply -f deployment.yaml  --validate=false
+          kubectl set image deployment/praksa2022-deployment praksa2022-image=milankovac99/praksa2022-image:latest
           kubectl rollout status deployment/praksa2022-deployment
