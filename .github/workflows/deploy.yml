@@ -49,6 +49,11 @@ jobs:
         run: |
            docker run -d -e PORT=8088 -p 8088:8088 milankovac99/praksa2022-image:latest
 
+      - name: Check Kubernetes cluster info
+        run: |
+         kubectl cluster-info
+         kubectl get nodes
+         kubectl get pods --all-namespaces
 
       - name: Download and install Minikube
         run: |
