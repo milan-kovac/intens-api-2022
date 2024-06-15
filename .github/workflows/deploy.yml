@@ -28,7 +28,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t milankovac99/praksa2022-image:latest .
+          docker build -t milankovac99/praksa2022-image:latest
           docker push milankovac99/praksa2022-image:latest
 
       - name: Log in to Docker Hub
