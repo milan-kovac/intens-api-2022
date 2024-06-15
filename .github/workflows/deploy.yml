@@ -46,6 +46,5 @@ jobs:
 
       - name: Update Kubernetes deployment
         run: |
-          echo "$KUBECONFIG" | base64 -d > $HOME/.kube/config
-          kubectl set image deployment/praksa2022-deployment praksa2022-image=$DOCKER_IMAGE
+          kubectl set image deployment/praksa2022-deployment praksa2022-image=milankovac99/praksa2022-image:latest --record=true
           kubectl rollout status deployment/praksa2022-deployment
