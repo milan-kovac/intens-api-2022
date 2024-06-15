@@ -44,11 +44,30 @@ jobs:
         with:
           version: 'latest'
           
-      - name: Get service info
-        run: kubectl get service praksa2022-service
-
-      - name: Apply Kubernetes deployment
+      - name: Setup Minikube
+        uses: azure/setup-minikube@v1
+        with:
+          minikube-version: 'latest'
+          kubernetes-version: 'latest'
+          driver: docker
+  
+      - name: Start Docker container locally
         run: |
-          kubectl apply -f deployment.yaml  --validate=false
-          kubectl set image deployment/praksa2022-deployment praksa2022-image=milankovac99/praksa2022-image:latest
-          kubectl rollout status deployment/praksa2022-deployment
+           docker run -d -e PORT=8088 -p 8088:8088 milankovac99/praksa2022-image:latest
+           
+      - name: Start Minikube
+        run: minikube start --driver=docker --wait=false
+        
+      - name: Set KUBECONFIG
+        run: echo "$(minikube -p minikube kubeconfig)" > $HOME/.kube/config
+
+      - name: Update Deployment image
+        run: kubectl set image deployment/praksa2022-deployment praksa2022-image=milankovac99/praksa2022-image:latest
+
+      - name: Check rollout status
+        run: kubectl rollout status deployment/praksa2022-deployment
+
+
+
+           
+
