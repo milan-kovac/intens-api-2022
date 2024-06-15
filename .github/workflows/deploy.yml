@@ -44,17 +44,17 @@ jobs:
         with:
           version: 'latest'
           
-      - name: Setup Minikube
-        uses: azure/setup-minikube@v1
-        with:
-          minikube-version: 'latest'
-          kubernetes-version: 'latest'
-          driver: docker
   
       - name: Start Docker container locally
         run: |
            docker run -d -e PORT=8088 -p 8088:8088 milankovac99/praksa2022-image:latest
-           
+
+
+      - name: Download and install Minikube
+        run: |
+         curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+         sudo install minikube /usr/local/bin/
+
       - name: Start Minikube
         run: minikube start --driver=docker --wait=false
         
